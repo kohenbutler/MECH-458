@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "Buttons.h"
 #include "Board.h"
 #include "Config.h"
 #include "DCmotor.h"

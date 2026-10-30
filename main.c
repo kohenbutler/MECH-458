@@ -71,19 +71,19 @@ int main(void){
 			}
 		}
 		
-		if(DCmotor_get_state() == 'F'){
+		if(DCmotor_get_state() == Forward){
 			LCDWriteStringXY(0,0,"Forward");
 			LCDWriteIntXY(0,1,adc_value,3);
 			LCDWriteIntXY(4,1,adc_value/2.55,3);
 			LCDWriteStringXY(7,1,"%");
 		}
-		if(DCmotor_get_state() == 'R'){
+		if(DCmotor_get_state() == Reverse){
 			LCDWriteStringXY(0,0,"Reverse");
 			LCDWriteIntXY(0,1,adc_value,3);
 			LCDWriteIntXY(4,1,adc_value/2.55,3);
 			LCDWriteStringXY(7,1,"%");
 		}
-		timer_delay_ms(20);
+		timer_delay_ms(50);
 		LCDClear();
 	}
 	return 0;

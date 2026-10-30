@@ -1,6 +1,10 @@
 #ifndef DCMOTOR_H
 #define DCMOTOR_H
 
+#define Brake 0
+#define Forward 1
+#define Reverse 2
+
 void DCMotor_init(void);
 void DCMotor_R(void);
 void DCMotor_F(void);

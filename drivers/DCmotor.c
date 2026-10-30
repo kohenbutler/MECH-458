@@ -2,9 +2,9 @@
 #include "Config.h"
 #include "Board.h"
 #include "Timer.h"
+#include "DCMotor.h"
 
-char DCMotor_states[3] = {'B', 'F', 'R'};
-int DCMotor_state = 0;
+int DCMotor_state = Brake;
 char kill_switch_flag = 0;
 char change_direction_flag = 0;
 
@@ -16,19 +16,19 @@ void DCMotor_init(){
 
 void DCMotor_Brake(){
 	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000011;
-	DCMotor_state = 0;
+	DCMotor_state = Brake;
 	return;
 }
 
 void DCMotor_F(){
 	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000010;
-	DCMotor_state = 1;
+	DCMotor_state = Forward;
 	return;
 }
 
 void DCMotor_R(){
 	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000001;
-	DCMotor_state = 2;
+	DCMotor_state = Reverse;
 	return;
 }
 
@@ -45,7 +45,7 @@ void DCMotor_Test(){
 }
 
 char DCmotor_get_state(){
-	return DCMotor_states[DCMotor_state];
+	return DCMotor_state;
 }
 
 void set_kill_switch_flag(){
