@@ -64,6 +64,7 @@ int main(void){
 		}
 		
 		if(kill_switch_active()){
+			DCMotor_Brake();
 			LCDWriteStringXY(0,0,"**KILL  SWITCH**");
 			while(1){
 				Lab1KnightRider();
