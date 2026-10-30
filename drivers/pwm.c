@@ -8,9 +8,6 @@ void pwm_init(void) {
 	TCCR0A |= 0b00000011;
 	TCCR0B &= 0b11110111;
 	
-	// Enable Compare Match A Interrupt
-	//TIMSK0 |= 0b00000010;
-	
 	// Clear OC0A on Compare Match
 	TCCR0A |= 0b10000000;
 	TCCR0A &= 0b10111111;

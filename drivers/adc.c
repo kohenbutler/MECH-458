@@ -25,13 +25,11 @@ unsigned char adc_get_result(void){
 	return ADC_result;
 }
 
-void adc_clear_flag(void){
+void clear_adc_result_flag(void){
 	ADC_result_flag = 0;
 }
 
 ISR(ADC_vect) {
 	ADC_result = ADCH;
 	ADC_result_flag = 1;
-	pwm_set_duty_cycle(adc_get_result());
-	adc_clear_flag();
 }

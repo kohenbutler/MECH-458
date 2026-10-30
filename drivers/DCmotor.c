@@ -5,6 +5,8 @@
 
 char DCMotor_states[3] = {'B', 'F', 'R'};
 int DCMotor_state = 0;
+char kill_switch_flag = 0;
+char change_direction_flag = 0;
 
 void DCMotor_init(){
 	DC_MOTOR_DDR |= DC_MOTOR_MASK; // Set IA and IB to outputs
@@ -12,9 +14,9 @@ void DCMotor_init(){
 	return;
 }
 
-void DCMotor_R(){
-	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000001;
-	DCMotor_state = 2;
+void DCMotor_Brake(){
+	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000011;
+	DCMotor_state = 0;
 	return;
 }
 
@@ -24,9 +26,9 @@ void DCMotor_F(){
 	return;
 }
 
-void DCMotor_Brake(){
-	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000011;
-	DCMotor_state = 0;
+void DCMotor_R(){
+	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000001;
+	DCMotor_state = 2;
 	return;
 }
 
@@ -44,4 +46,32 @@ void DCMotor_Test(){
 
 char DCmotor_get_state(){
 	return DCMotor_states[DCMotor_state];
+}
+
+void set_kill_switch_flag(){
+	kill_switch_flag = 1;
+	return;
+}
+
+void clear_kill_switch_flag(){
+	kill_switch_flag = 0;
+	return;
+}
+
+char kill_switch_active(){
+	return kill_switch_flag;
+}
+
+void set_change_direction_flag(){
+	change_direction_flag = 1;
+	return;
+}
+
+void clear_change_direction_flag(){
+	change_direction_flag = 0;
+	return;
+}
+
+char is_change_direction(){
+	return change_direction_flag;
 }

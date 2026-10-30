@@ -5,7 +5,6 @@ void timer1_init(void){
 	TCCR1B |= _BV(WGM12); // Auto clear timer on match
 	OCR1A = 1000; // Timer counts to 1000 (1ms)
 	TCNT1 = 0x0000; // Reset counter to 0 on match
-	//TIMSK1 |= 0b00000010; // Enable interrupt on match
 	TIFR1 = _BV(OCF1A); // Clear any pending compare-match flag
 	TCCR1B |= _BV(CS11); // Start Timer1 with a /8 prescaler (1MHz)
 	return;
