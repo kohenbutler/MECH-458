@@ -49,12 +49,12 @@ int main(void){
 		if(is_change_direction()){
 			timer_delay_ms(200); // Debouncing Delay
 			switch(DCmotor_get_state()){
-				case('F'):
+				case(Forward):
 					DCMotor_Brake();
 					timer_delay_ms(5);
 					DCMotor_R();
 					break;
-				case('R'):
+				case(Reverse):
 					DCMotor_Brake();
 					timer_delay_ms(5);
 					DCMotor_F();
