@@ -9,5 +9,7 @@
 
 // Default Values
 #define PWM_DEFAULT_DUTY_CYCLE       0
+#define DEBOUNCE_DELAY              20
+#define BRAKING_DELAY                5
 
 #endif

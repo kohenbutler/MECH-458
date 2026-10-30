@@ -33,4 +33,10 @@
 #define DC_MOTOR_PORT    PORTB
 #define DC_MOTOR_MASK    0b00000011
 
+// Button Hardware
+#define BUTTON_DDR       DDRD
+#define BUTTON_PORT      PORTD
+#define BUTTON_MASK      0b00000000
+#define BUTTON_INPUT_REGISTER PIND
+
 #endif

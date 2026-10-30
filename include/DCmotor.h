@@ -12,7 +12,6 @@ void DCMotor_Brake(void);
 void DCMotor_Test(void);
 char DCmotor_get_state(void);
 void set_kill_switch_flag(void);
-void clear_kill_switch_flag(void);
 char kill_switch_active(void);
 void set_change_direction_flag(void);
 void clear_change_direction_flag(void);

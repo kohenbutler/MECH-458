@@ -53,11 +53,6 @@ void set_kill_switch_flag(){
 	return;
 }
 
-void clear_kill_switch_flag(){
-	kill_switch_flag = 0;
-	return;
-}
-
 char kill_switch_active(){
 	return kill_switch_flag;
 }
