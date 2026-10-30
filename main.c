@@ -5,11 +5,15 @@
 #include "Buttons.h"
 #include "Config.h"
 #include "DCmotor.h"
+#include "lcd.h"
 #include "Led.h"
 #include "LinkedList.h"
+#include "myutils.h"
 #include "pwm.h"
 #include "Stepper.h"
 #include "Timer.h"
+
+int adc_value = 0;
 
 int main(void){
 	cli(); // Disable interrupts during configuration
@@ -26,6 +30,8 @@ int main(void){
 	adc_init();
 	buttons_init();
 	DCMotor_init();
+	InitLCD(LS_BLINK|LS_ULINE);
+	LCDClear();
 	
 	sei(); // Enable global interrupts
 	
@@ -35,7 +41,7 @@ int main(void){
 	
 	while (1){
 		if(adc_is_ready()){
-			int adc_value = adc_get_result();
+			adc_value = adc_get_result();
 			pwm_set_duty_cycle(adc_value);
 			clear_adc_result_flag();
 		}
@@ -58,10 +64,26 @@ int main(void){
 		}
 		
 		if(kill_switch_active()){
+			LCDWriteStringXY(0,0,"**KILL  SWITCH**");
 			while(1){
 				Lab1KnightRider();
 			}
 		}
+		
+		if(DCmotor_get_state() == 'F'){
+			LCDWriteStringXY(0,0,"Forward");
+			LCDWriteIntXY(0,1,adc_value,3);
+			LCDWriteIntXY(4,1,adc_value/2.55,3);
+			LCDWriteStringXY(7,1,"%");
+		}
+		if(DCmotor_get_state() == 'R'){
+			LCDWriteStringXY(0,0,"Reverse");
+			LCDWriteIntXY(0,1,adc_value,3);
+			LCDWriteIntXY(4,1,adc_value/2.55,3);
+			LCDWriteStringXY(7,1,"%");
+		}
+		timer_delay_ms(20);
+		LCDClear();
 	}
 	return 0;
 }
