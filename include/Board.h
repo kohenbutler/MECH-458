@@ -14,9 +14,13 @@
 #define RED_LED_MASK     0b11111111
 
 // Stepper Motor hardware
-#define STEPPER_DDR	     DDRA
-#define STEPPER_PORT     PORTA
-#define STEPPER_MASK     0b00111111
+#define STEPPER_DDR	       DDRA
+#define STEPPER_PORT       PORTA
+#define STEPPER_MASK       0b00111111
+#define STEPPER_HOME_DDR   DDRL
+#define STEPPER_HOME_PORT  PORTL
+#define STEPPER_HOME_MASK  0b00001000
+#define STEPPER_HOME_INPUT PINL
 
 // PWM hardware
 #define PWM_DDR          DDRB

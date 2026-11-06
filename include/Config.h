@@ -12,4 +12,15 @@
 #define DEBOUNCE_DELAY              20
 #define BRAKING_DELAY                5
 
+// Conveyor States
+#define BRAKE 0
+#define FORWARD 1
+#define REVERSE 2
+
+// Belt States
+#define BLACK 0
+#define ALUMINIUM 1
+#define WHITE 2
+#define STEEL 3
+
 #endif

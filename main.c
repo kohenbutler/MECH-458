@@ -35,72 +35,38 @@ int main(void){
 	
 	sei(); // Enable global interrupts
 	
-	LED_test();
-	adc_start_conversion(); // Start the first adc conversion
+	stepper_home();
+	timer_delay_ms(2000);
+	s_curve_demo();
+	pwm_set_duty_cycle(128);
+	LCDClear();
+	LCDWriteStringXY(0,0,"PRESS TO START");
 	
 	while (1){
-
-		if(adc_is_ready()){
-			adc_value = adc_get_result();
-			pwm_set_duty_cycle(adc_value);
-			clear_adc_result_flag();
-		}
 		
-		if(is_change_direction()){
-			switch(DCmotor_get_state()){
-				case(Forward):
+		if(was_pause_button_pressed()){
+			switch(is_paused()){
+				case(0):
+					Pause();
 					DCMotor_Brake();
-					timer_delay_ms(BRAKING_DELAY);
-					DCMotor_R();
+					LCDClear();
+					LCDWriteStringXY(0,0,"PAUSED");
 					break;
-				case(Reverse):
-					DCMotor_Brake();
-					timer_delay_ms(BRAKING_DELAY);
+				case(1):
+					Unpause();
 					DCMotor_F();
-					break;
-				case(Brake):
-					DCMotor_F();
+					LCDClear();
+					LCDWriteStringXY(0,0,"FORWARD");
 					break;
 			}
 			timer_delay_ms(DEBOUNCE_DELAY);
-			while((BUTTON_INPUT_REGISTER & 0b00000100) == 0b00000100){
-			}
+			while((BUTTON_INPUT_REGISTER & 0b00000010) == 0b00000000){}
 			timer_delay_ms(DEBOUNCE_DELAY);
-			Enable_INT2();
-			clear_change_direction_flag();
+			Enable_INT1();
+			clear_pause_button_pressed();
 		}
 		
-		if(kill_switch_active()){
-			DCMotor_Brake();
-			LCDClear();
-			LCDWriteStringXY(0,0,"**KILL  SWITCH**");
-			while(1){
-				Lab1KnightRider();
-			}
-		}
-		
-		if(DCmotor_get_state() == Forward){
-			LCDClear();
-			LCDWriteStringXY(0,0,"Forward");
-			LCDWriteIntXY(0,1,adc_value,3);
-			LCDWriteIntXY(4,1,adc_value/2.55,3);
-			LCDWriteStringXY(7,1,"%");
-		}
-		
-		if(DCmotor_get_state() == Reverse){
-			LCDClear();
-			LCDWriteStringXY(0,0,"Reverse");
-			LCDWriteIntXY(0,1,adc_value,3);
-			LCDWriteIntXY(4,1,adc_value/2.55,3);
-			LCDWriteStringXY(7,1,"%");
-		}
-		
-		if(DCmotor_get_state() == Brake){
-			LCDClear();
-			LCDWriteStringXY(0,0,"Press to Start");
-		}
-		
-		timer_delay_ms(10);
+		timer_delay_ms(20);
 	}
 	return 0;
 }

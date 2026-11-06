@@ -4,9 +4,8 @@
 #include "Timer.h"
 #include "DCMotor.h"
 
-int DCMotor_state = Brake;
-char kill_switch_flag = 0;
-char change_direction_flag = 0;
+int DCMotor_state = BRAKE;
+int Paused = 1;
 
 void DCMotor_init(){
 	DC_MOTOR_DDR |= DC_MOTOR_MASK; // Set IA and IB to outputs
@@ -16,31 +15,19 @@ void DCMotor_init(){
 
 void DCMotor_Brake(){
 	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000011;
-	DCMotor_state = Brake;
+	DCMotor_state = BRAKE;
 	return;
 }
 
 void DCMotor_F(){
 	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000010;
-	DCMotor_state = Forward;
+	DCMotor_state = FORWARD;
 	return;
 }
 
 void DCMotor_R(){
 	DC_MOTOR_PORT = (DC_MOTOR_PORT & ~(DC_MOTOR_MASK)) | 0b00000001;
-	DCMotor_state = Reverse;
-	return;
-}
-
-void DCMotor_Test(){
-	DCMotor_R();
-	timer_delay_ms(10000);
-	DCMotor_Brake();
-	timer_delay_ms(1000);
-	DCMotor_F();
-	timer_delay_ms(10000);
-	DCMotor_Brake();
-	timer_delay_ms(1000);
+	DCMotor_state = REVERSE;
 	return;
 }
 
@@ -48,25 +35,16 @@ char DCmotor_get_state(){
 	return DCMotor_state;
 }
 
-void set_kill_switch_flag(){
-	kill_switch_flag = 1;
+void Pause(){
+	Paused = 1;
 	return;
 }
 
-char kill_switch_active(){
-	return kill_switch_flag;
-}
-
-void set_change_direction_flag(){
-	change_direction_flag = 1;
+void Unpause(){
+	Paused = 0;
 	return;
 }
 
-void clear_change_direction_flag(){
-	change_direction_flag = 0;
-	return;
-}
-
-char is_change_direction(){
-	return change_direction_flag;
+int is_paused(){
+	return Paused;
 }
