@@ -5,6 +5,7 @@
 
 char step_states[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
 int stepper_state = 0; // Tracks the last step
+int bin_state;
 
 int stepper_delays_90[] = {
 	16001, 15826, 15326, 14568, 13638, 12624, 11598, 10612,  9697,  8868,
@@ -60,6 +61,7 @@ void stepper_home(){
 	while((STEPPER_HOME_INPUT & STEPPER_HOME_MASK) == STEPPER_HOME_MASK){
 		step_cw(1);
 	}
+	bin_state = BLACK;
 	return;
 }
 
@@ -70,6 +72,7 @@ void step_cw90(){
 		timer_delay_us(stepper_delays_90[i]); // Speed Control
 	}
 	timer_delay_us(stepper_delays_90[50]);
+	bin_state = (bin_state + 1) % 4;
 	return;
 }
 
@@ -80,6 +83,7 @@ void step_ccw90(){
 		timer_delay_us(stepper_delays_90[i]); // Speed Control
 	}
 	timer_delay_us(stepper_delays_90[50]);
+	bin_state = (bin_state + 3) % 4;
 	return;
 }
 
@@ -90,10 +94,11 @@ void step_180(){
 		timer_delay_us(stepper_delays_180[i]); // Speed Control
 	}
 	timer_delay_us(stepper_delays_180[100]);
+	bin_state = (bin_state + 2) % 4;
 	return;
 }
 
-void s_curve_demo(){
+void s_curve_test(){
 	step_180();
 	step_ccw90();
 	step_cw90();
@@ -101,4 +106,27 @@ void s_curve_demo(){
 	step_180();
 	step_ccw90();
 	step_180();
+}
+
+int get_bin_state(){
+	return bin_state;
+}
+
+void Update_Stepper_Position(int pos){
+	if(pos < 0){
+		return;
+	}
+	int i = (pos - bin_state + 4) % 4;
+	switch(i){
+		case 0:
+			break;
+		case 1:
+			step_cw90();
+			break;
+		case 2:
+			step_180();
+			break;
+		case 3:
+			step_ccw90();
+	}
 }

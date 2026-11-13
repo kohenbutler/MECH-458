@@ -1,7 +1,7 @@
 #include "Timer.h"
 #include <avr/io.h>
 
-void timer1_init(void){
+void timer1_init(){
 	TCCR1B |= _BV(WGM12); // Auto clear timer on match
 	OCR1A = 1000;         // Timer counts to 1000 (1ms)
 	TCNT1 = 0x0000;       // Reset counter to 0

@@ -3,7 +3,7 @@
 #include "Config.h"
 #include "Board.h"
 
-void pwm_init(void) {
+void pwm_init() {
 	// Fast PWM Mode (WGM bits = 011)
 	TCCR0A |= 0b00000011;
 	TCCR0B &= 0b11110111;

@@ -6,8 +6,11 @@ void Enable_INT1(void);
 void Disable_INT1(void);
 void Enable_INT2(void);
 void Disable_INT2(void);
-void set_pause_button_pressed(void);
-void clear_pause_button_pressed(void);
-int was_pause_button_pressed(void);
+void set_left_button_pressed(void);
+void clear_left_button_pressed(void);
+int was_left_button_pressed(void);
+void set_right_button_pressed(void);
+void clear_right_button_pressed(void);
+int was_right_button_pressed(void);
 
 #endif
