@@ -8,7 +8,7 @@
 #define STEPPER_DEMO_DELAY_MS     1000
 
 // Default Values
-#define PWM_DEFAULT_DUTY_CYCLE     128
+#define PWM_DEFAULT_DUTY_CYCLE     100
 #define DEBOUNCE_DELAY              20
 #define BRAKING_DELAY                5
 
@@ -22,5 +22,9 @@
 #define ALUMINIUM 1
 #define WHITE 2
 #define STEEL 3
+
+#define AS_THRESHOLD 300
+#define SW_THRESHOLD 800
+#define WB_THRESHOLD 945
 
 #endif

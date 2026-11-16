@@ -6,8 +6,8 @@
 #include "DCmotor.h"
 #include "Timer.h"
 
-int left_button_pressed = 0;
-int right_button_pressed = 0;
+volatile int left_button_pressed = 0;
+volatile int right_button_pressed = 0;
 
 void buttons_init(){
 	BUTTON_DDR &= ~(BUTTON_MASK);

@@ -35,33 +35,66 @@ int main(){
 	
 	stepper_home();                             // Initialize bin on black
 	pwm_set_duty_cycle(PWM_DEFAULT_DUTY_CYCLE); // Run the motor at 50% for now
-	fifo_append(BLACK);
-	fifo_append(WHITE);
-	fifo_append(ALUMINIUM);
-	fifo_append(STEEL);
+	DCMotor_F();
+	
+	unsigned int min = 1024;
 	
 	/* Main Loop */
 	while (1){
-		
-		/* Update Stepper Position*/
-		if(get_bin_state() != get_next_block_type()){            // If bin state does not match next block
-			Update_Stepper_Position(get_next_block_type());      // Move the bin to the correct state
+	
+		/* If Block at Reflective sensor */
+		if(is_OR_flag()){
+			if((OR_INPUT_REGISTER & OR_MASK) != OR_MASK){ // If block is gone
+				int block_type = classify_block(min);
+				fifo_append(block_type);
+				LCDClear();
+				LCDWriteIntXY(0,0,min,4);
+				switch(block_type){
+					case(BLACK):
+						LCDWriteStringXY(0,1,"BLACK");
+						break;
+					case(ALUMINIUM):
+						LCDWriteStringXY(0,1,"ALUMINIUM");
+						break;
+					case(WHITE):
+						LCDWriteStringXY(0,1,"WHITE");
+						break;
+					case(STEEL):
+						LCDWriteStringXY(0,1,"STEEL");
+						break;
+				}
+				clear_OR_flag();
+				min = 1024;
+			}
+			else{
+				adc_start_conversion();
+			}
 		}
 		
-		/* If Block at end of belt*/
+		if(adc_is_ready()){
+			unsigned int shiny = adc_get_result();
+			if(shiny < min){
+				min = shiny;
+			}
+			clear_adc_result_flag();
+		}
+		
+		/* If Block at end of belt */
 		if(is_block_at_end_flag()){
 			if(get_bin_state() != get_next_block_type()){        // Check bin position
-				DCMotor_Brake();                                 // If wrong, Stop belt
-				Update_Stepper_Position(get_next_block_type());  //           Change position
-				DCMotor_F();                                     //           Start belt
+				Update_Stepper_Position(get_next_block_type());  // If wrong, Change position
 			}
+			DCMotor_F();
 			fifo_pop_front();                                    // Remove from fifo
 			clear_block_at_end_flag();                           // Clear flag
 		}
 		
 		/* Left Button Handler */
 		if(was_left_button_pressed()){
-			// Do Something
+			DCMotor_Brake();
+			while(1){
+				Lab1KnightRider();
+			}
 			timer_delay_ms(DEBOUNCE_DELAY);
 			while((BUTTON_INPUT_REGISTER & 0b00000010) == 0b00000000){} // Stall if button is held (active low)
 			timer_delay_ms(DEBOUNCE_DELAY);

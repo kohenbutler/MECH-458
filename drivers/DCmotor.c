@@ -5,8 +5,8 @@
 #include "Timer.h"
 #include "DCMotor.h"
 
-int DCMotor_state = BRAKE;
-int block_at_end_flag = 0;
+volatile int DCMotor_state = BRAKE;
+volatile int block_at_end_flag = 0;
 
 void DCMotor_init(){
 	DC_MOTOR_DDR |= DC_MOTOR_MASK;        // Set IA and IB to outputs
@@ -56,6 +56,6 @@ int is_block_at_end_flag(){
 }
 
 ISR(INT0_vect) {
-	// We may need to add an emergency brake
+	DCMotor_Brake();
 	set_block_at_end_flag();
 }

@@ -30,7 +30,11 @@
 // ADC hardware
 #define ADC_DDR          DDRF
 #define ADC_PORT         PORTF
-#define ADC_MASK         0b111111110
+#define ADC_MASK         0b00000001
+#define OR_DDR           DDRD
+#define OR_PORT          PORTD
+#define OR_MASK          0b00001000
+#define OR_INPUT_REGISTER PIND
 
 // DC Motor hardware
 #define DC_MOTOR_DDR     DDRB

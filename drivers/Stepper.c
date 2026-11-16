@@ -3,9 +3,9 @@
 #include "Timer.h"
 #include "Board.h"
 
-char step_states[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
-int stepper_state = 0; // Tracks the last step
-int bin_state;
+volatile char step_states[4] = {0b00110000, 0b00000110, 0b00101000, 0b00000101};
+volatile int stepper_state = 0; // Tracks the last step
+volatile int bin_state;
 
 int stepper_delays_90[] = {
 	16001, 15826, 15326, 14568, 13638, 12624, 11598, 10612,  9697,  8868,
