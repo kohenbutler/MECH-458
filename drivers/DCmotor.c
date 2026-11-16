@@ -1,15 +1,21 @@
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "Config.h"
 #include "Board.h"
 #include "Timer.h"
 #include "DCMotor.h"
 
 int DCMotor_state = BRAKE;
-int Paused = 1;
+int block_at_end_flag = 0;
 
 void DCMotor_init(){
-	DC_MOTOR_DDR |= DC_MOTOR_MASK; // Set IA and IB to outputs
-	DC_MOTOR_PORT |= DC_MOTOR_MASK; // Initialize in Brake mode
+	DC_MOTOR_DDR |= DC_MOTOR_MASK;        // Set IA and IB to outputs
+	DC_MOTOR_PORT |= DC_MOTOR_MASK;       // Initialize in Brake mode
+	
+	BELT_END_DDR &= ~(BELT_END_MASK);     
+
+	EIMSK |= _BV(INT0);                   // Enable INT0
+	EICRA |= _BV(ISC01);                  // Falling edge trigger for active low
 	return;
 }
 
@@ -35,16 +41,21 @@ char DCmotor_get_state(){
 	return DCMotor_state;
 }
 
-void Pause(){
-	Paused = 1;
+void set_block_at_end_flag(){
+	block_at_end_flag = 1;
 	return;
 }
 
-void Unpause(){
-	Paused = 0;
+void clear_block_at_end_flag(){
+	block_at_end_flag = 0;
 	return;
 }
 
-int is_paused(){
-	return Paused;
+int is_block_at_end_flag(){
+	return block_at_end_flag;
+}
+
+ISR(INT0_vect) {
+	// We may need to add an emergency brake
+	set_block_at_end_flag();
 }

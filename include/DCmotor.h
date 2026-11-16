@@ -7,8 +7,8 @@ void DCMotor_F(void);
 void DCMotor_Brake(void);
 void DCMotor_Test(void);
 char DCmotor_get_state(void);
-void Pause(void);
-void Unpause(void);
-int is_paused(void);
+void set_block_at_end_flag(void);
+void clear_block_at_end_flag(void);
+int is_block_at_end_flag(void);
 
 #endif

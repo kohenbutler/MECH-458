@@ -1,11 +1,10 @@
 #include "adc.h"
 #include "Board.h"
-#include "pwm.h"
 
 unsigned int ADC_result = 0;
 unsigned int ADC_result_flag = 0;
 
-void adc_init(void) {
+void adc_init() {
 	ADC_DDR &= ADC_MASK;  // Set DDRF to inputs
 	ADCSRA = _BV(ADEN) | _BV(ADIE); // Enable ADC, Enable ADC interrupt
 	ADCSRB &= 0b11111000; // Set to Free Running Mode
@@ -18,15 +17,15 @@ void adc_start_conversion(char channel){
 	ADCSRA |= _BV(ADSC);
 }
 
-unsigned char adc_is_ready(void){
+unsigned char adc_is_ready(){
 	return ADC_result_flag;
 }
 
-unsigned char adc_get_result(void){
+unsigned char adc_get_result(){
 	return ADC_result;
 }
 
-void clear_adc_result_flag(void){
+void clear_adc_result_flag(){
 	ADC_result_flag = 0;
 }
 

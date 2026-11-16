@@ -4,11 +4,11 @@
 // Timing Delays (milliseconds)
 #define LED_KNIGHT_RIDER_DELAY_MS  150
 #define LED_TEST_DELAY_MS         2000
-#define STEPPER_DELAY_MS	        20 // Stepper Speed Control
+#define STEPPER_DELAY_MS	        20
 #define STEPPER_DEMO_DELAY_MS     1000
 
 // Default Values
-#define PWM_DEFAULT_DUTY_CYCLE       0
+#define PWM_DEFAULT_DUTY_CYCLE     128
 #define DEBOUNCE_DELAY              20
 #define BRAKING_DELAY                5
 
@@ -17,7 +17,7 @@
 #define FORWARD 1
 #define REVERSE 2
 
-// Belt States
+// Bin States and Block Types
 #define BLACK 0
 #define ALUMINIUM 1
 #define WHITE 2

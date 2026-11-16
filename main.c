@@ -13,9 +13,7 @@
 #include "Stepper.h"
 #include "Timer.h"
 
-int adc_value = 0;
-
-int main(void){
+int main(){
 	cli(); // Disable interrupts during configuration
 	
 	/* Clock Configuration */
@@ -35,38 +33,51 @@ int main(void){
 	
 	sei(); // Enable global interrupts
 	
-	stepper_home();
-	timer_delay_ms(2000);
-	s_curve_demo();
-	pwm_set_duty_cycle(128);
-	LCDClear();
-	LCDWriteStringXY(0,0,"PRESS TO START");
+	stepper_home();                             // Initialize bin on black
+	pwm_set_duty_cycle(PWM_DEFAULT_DUTY_CYCLE); // Run the motor at 50% for now
+	fifo_append(BLACK);
+	fifo_append(WHITE);
+	fifo_append(ALUMINIUM);
+	fifo_append(STEEL);
 	
+	/* Main Loop */
 	while (1){
 		
-		if(was_pause_button_pressed()){
-			switch(is_paused()){
-				case(0):
-					Pause();
-					DCMotor_Brake();
-					LCDClear();
-					LCDWriteStringXY(0,0,"PAUSED");
-					break;
-				case(1):
-					Unpause();
-					DCMotor_F();
-					LCDClear();
-					LCDWriteStringXY(0,0,"FORWARD");
-					break;
-			}
-			timer_delay_ms(DEBOUNCE_DELAY);
-			while((BUTTON_INPUT_REGISTER & 0b00000010) == 0b00000000){}
-			timer_delay_ms(DEBOUNCE_DELAY);
-			Enable_INT1();
-			clear_pause_button_pressed();
+		/* Update Stepper Position*/
+		if(get_bin_state() != get_next_block_type()){            // If bin state does not match next block
+			Update_Stepper_Position(get_next_block_type());      // Move the bin to the correct state
 		}
 		
-		timer_delay_ms(20);
+		/* If Block at end of belt*/
+		if(is_block_at_end_flag()){
+			if(get_bin_state() != get_next_block_type()){        // Check bin position
+				DCMotor_Brake();                                 // If wrong, Stop belt
+				Update_Stepper_Position(get_next_block_type());  //           Change position
+				DCMotor_F();                                     //           Start belt
+			}
+			fifo_pop_front();                                    // Remove from fifo
+			clear_block_at_end_flag();                           // Clear flag
+		}
+		
+		/* Left Button Handler */
+		if(was_left_button_pressed()){
+			// Do Something
+			timer_delay_ms(DEBOUNCE_DELAY);
+			while((BUTTON_INPUT_REGISTER & 0b00000010) == 0b00000000){} // Stall if button is held (active low)
+			timer_delay_ms(DEBOUNCE_DELAY);
+			Enable_INT1();
+			clear_left_button_pressed();
+		}
+		
+		/* Right Button Handler */
+		if(was_right_button_pressed()){
+			// Do Something
+			timer_delay_ms(DEBOUNCE_DELAY);
+			while((BUTTON_INPUT_REGISTER & 0b00000100) == 0b00000100){} // Stall if button is held (active high)
+			timer_delay_ms(DEBOUNCE_DELAY);
+			Enable_INT2();
+			clear_right_button_pressed();
+		}
 	}
 	return 0;
 }
