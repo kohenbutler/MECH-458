@@ -9,6 +9,9 @@ typedef struct Node {
 Node *head = NULL; // Initialize head and tail to NULL
 Node *tail = NULL;
 
+volatile unsigned int num_partially_sorted = 0;
+volatile unsigned int num_sorted[4] = {0, 0, 0, 0};
+
 void fifo_append(int block_type) {
 	Node *newNode = malloc(sizeof(Node));
 	newNode->block_type = block_type;
@@ -22,10 +25,21 @@ void fifo_append(int block_type) {
 		head = newNode;
 		tail = newNode;
 	}
+	num_partially_sorted += 1;
 	return;
 }
 
+int get_next_block_type() {
+	if (head == NULL) {
+		return -1; // Empty indicator
+	}
+	return head->block_type;
+}
+
 void fifo_pop_front() {
+	int block_type = get_next_block_type();
+	num_partially_sorted -= 1;             // reduce count of partially sorted pieces
+	num_sorted[block_type] += 1;           // increase count of sorted pieces
 	if (head == NULL){ // If list is empty
 		return;
 	}
@@ -38,13 +52,6 @@ void fifo_pop_front() {
 	return;
 }
 
-int get_next_block_type() {
-	if (head == NULL) {
-		return -1; // Empty indicator
-	}
-	return head->block_type;
-}
-
 int is_fifo_empty(){
 	return (head == NULL);
 }
@@ -53,4 +60,12 @@ void clear_fifo() {
 	while (!is_fifo_empty()){ // Pop front until fifo is empty
 		fifo_pop_front();
 	}
+}
+
+unsigned int get_num_sorted(int block_type){
+	return num_sorted[block_type];
+}
+
+unsigned int get_num_partially_sorted(){
+	return num_partially_sorted;
 }

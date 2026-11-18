@@ -16,8 +16,8 @@ void pwm_init() {
 	TCCR0B |= 0b00000011;
 	TCCR0B &= 0b11111011;
 	
-	// Set duty cycle to default
-	OCR0A = PWM_DEFAULT_DUTY_CYCLE;
+	// Set duty cycle
+	OCR0A = DC_MOTOR_SPEED;
 	
 	// Set PB7 to output PWM
 	PWM_DDR = PWM_MASK;

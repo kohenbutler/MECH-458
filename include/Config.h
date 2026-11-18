@@ -8,7 +8,7 @@
 #define STEPPER_DEMO_DELAY_MS     1000
 
 // Default Values
-#define PWM_DEFAULT_DUTY_CYCLE     100
+#define DC_MOTOR_SPEED             100 // [0,255]
 #define DEBOUNCE_DELAY              20
 #define BRAKING_DELAY                5
 
@@ -23,8 +23,17 @@
 #define WHITE 2
 #define STEEL 3
 
+// Shininess Thresholds
 #define AS_THRESHOLD 300
 #define SW_THRESHOLD 800
-#define WB_THRESHOLD 945
+#define WB_THRESHOLD 938
+
+// Ramp Down Timing
+#define RAMP_DOWN_THRESHOLD 150000
+
+// System States
+#define PAUSE 0
+#define RUN   1
+#define RAMP_DOWN 2
 
 #endif

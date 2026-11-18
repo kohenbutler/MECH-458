@@ -7,7 +7,9 @@
 #include "Timer.h"
 
 volatile int left_button_pressed = 0;
+volatile int left_button_wait_release = 0;
 volatile int right_button_pressed = 0;
+volatile int right_button_wait_release = 0;
 
 void buttons_init(){
 	BUTTON_DDR &= ~(BUTTON_MASK);
@@ -49,6 +51,20 @@ void clear_left_button_pressed(){
 	return;
 }
 
+void set_left_button_wait_release(){
+	left_button_wait_release = 1;
+	return;
+}
+
+void clear_left_button_wait_release(){
+	left_button_wait_release = 0;
+	return;
+}
+
+int get_left_button_wait_release(){
+	return left_button_wait_release;
+}
+
 int was_left_button_pressed(){
 	return left_button_pressed;
 }
@@ -67,9 +83,23 @@ int was_right_button_pressed(){
 	return right_button_pressed;
 }
 
+void set_right_button_wait_release(){
+	right_button_wait_release = 1;
+	return;
+}
+
+void clear_right_button_wait_release(){
+	right_button_wait_release = 0;
+	return;
+}
+
+int get_right_button_wait_release(){
+	return right_button_wait_release;
+}
+
 ISR(INT1_vect) {
 	set_left_button_pressed();
-	Disable_INT1();       // Temporrily disable for debouncing
+	Disable_INT1();       // Temporarily disable for debouncing
 }
 
 ISR(INT2_vect) {
