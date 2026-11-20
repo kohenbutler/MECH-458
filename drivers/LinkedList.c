@@ -40,14 +40,14 @@ void fifo_pop_front() {
 	if (head == NULL){ // If list is empty
 		return;
 	}
+	num_partially_sorted -= 1;                    // reduce count of partially sorted pieces
+	num_sorted[get_next_block_type()] += 1;      // increase count of sorted pieces
 	Node *temp = head;
 	head = head->next;
 	if (head == NULL) { // If last item in list
 		tail = NULL;    // Also set tail to NULL
 	}
 	free(temp);         // Free memory
-	num_partially_sorted -= 1;                    // reduce count of partially sorted pieces
-	num_sorted[get_next_block_type()] += 1;      // increase count of sorted pieces
 	return;
 }
 

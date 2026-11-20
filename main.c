@@ -53,14 +53,14 @@ int main(){
 	while (1){
 		if(system_state){
 			/* If Block at Reflective Sensor */
-			if((OR_INPUT_REGISTER & OR_MASK) == OR_MASK && !is_OR_flag()){ // Check for block (active high) and that previous block has been processed
+			if((OR_INPUT_REGISTER & OR_MASK) == OR_MASK && !is_OR_flag()){ // Check for block (Previous block must be classified before starting another adc conversion)
 				if(!(adc_in_progress()) && !(adc_conversion_complete())){  // If ADC not doing a conversion and previous conversion was processed
 					adc_start_conversion();                                // Start another ADC conversion
 				}
 			}
 			
 			/* If Block has Left Sensor */
-			if(is_OR_flag()){
+			if(is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){ // If block has left sensor, adc is not stil converting, last conversion was processed, Then we can classify the block
 				int block_type = classify_block(adc_get_min());     // classify the block based on it's minimum adc reading
 				fifo_append(block_type);                            // add this block to the fifo
 				clear_OR_flag();                                    // clear the block gone flag
@@ -78,7 +78,7 @@ int main(){
 			}
 			
 			/* If ADC Conversion Complete */
-			if(adc_conversion_complete()){
+			if(adc_conversion_complete()){              // If ADC result is waiting to be processed
 				adc_update_min(adc_get_result());       // Update the minimum adc reading for this block
 				clear_adc_result_flag();                // clear the adc conversion complete flag
 			}
