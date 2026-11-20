@@ -5,11 +5,12 @@
 volatile unsigned int ADC_result = 0;
 volatile unsigned int ADC_result_flag = 0;
 volatile int OR_flag = 0;
+volatile unsigned int min = 1024;
 
 void adc_init() {
 	OR_DDR &= ~(OR_MASK);                 // Set OR as an input
 	EIMSK |= _BV(INT3);                   // Enable INT3
-	EICRA |= (_BV(ISC31) | _BV(ISC30));   // Rising edge trigger for active high
+	EICRA |= _BV(ISC31);                  // Falling edge trigger to detect when block leaves
 	
 	ADC_DDR &= ~(ADC_MASK);  // Set DDRF to inputs
 	ADCSRA = _BV(ADEN) | _BV(ADIE) | _BV(ADPS2) | _BV(ADPS1); // Enable ADC, Enable ADC interrupt, and set Prescaler to 64
@@ -38,7 +39,7 @@ void Enable_INT3(){
 }
 
 void Disable_INT3(){
-	EIMSK &= 0b11111011;  // Disable INT3
+	EIMSK &= 0b11110111;  // Disable INT3
 	return;
 }
 
@@ -50,7 +51,7 @@ void adc_start_conversion(){
 	ADCSRA |= _BV(ADSC);
 }
 
-unsigned char adc_is_ready(){
+unsigned char adc_conversion_complete(){
 	return ADC_result_flag;
 }
 
@@ -73,6 +74,26 @@ int classify_block(int val){
 		return WHITE;
 	}
 	return BLACK;
+}
+
+void adc_update_min(int val){
+	if(val < min){
+		min = val;
+	}
+	return;
+}
+
+void adc_reset_min(){
+	min = 1024;
+	return;
+}
+
+unsigned int adc_get_min(){
+	return min;
+}
+
+int adc_in_progress(){
+	return ((ADCSRA & _BV(ADSC)) == _BV(ADSC));
 }
 
 ISR(ADC_vect) {

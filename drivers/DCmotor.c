@@ -56,6 +56,6 @@ int is_block_at_end_flag(){
 }
 
 ISR(INT0_vect) {
-	DCMotor_Brake();
+	DCMotor_Brake();        // BRAKE IMMEDIATELY to prevent block from falling
 	set_block_at_end_flag();
 }

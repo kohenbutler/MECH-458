@@ -37,9 +37,6 @@ int get_next_block_type() {
 }
 
 void fifo_pop_front() {
-	int block_type = get_next_block_type();
-	num_partially_sorted -= 1;             // reduce count of partially sorted pieces
-	num_sorted[block_type] += 1;           // increase count of sorted pieces
 	if (head == NULL){ // If list is empty
 		return;
 	}
@@ -49,6 +46,8 @@ void fifo_pop_front() {
 		tail = NULL;    // Also set tail to NULL
 	}
 	free(temp);         // Free memory
+	num_partially_sorted -= 1;                    // reduce count of partially sorted pieces
+	num_sorted[get_next_block_type()] += 1;      // increase count of sorted pieces
 	return;
 }
 
