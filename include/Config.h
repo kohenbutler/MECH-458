@@ -24,9 +24,9 @@
 #define STEEL 3
 
 // Shininess Thresholds
-#define AS_THRESHOLD 300
-#define SW_THRESHOLD 800
-#define WB_THRESHOLD 938
+#define AS_THRESHOLD 150
+#define SW_THRESHOLD 700
+#define WB_THRESHOLD 900
 
 // Ramp Down Timing
 #define RAMP_DOWN_THRESHOLD 150000

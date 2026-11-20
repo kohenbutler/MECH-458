@@ -61,8 +61,27 @@ int main(){
 			
 			/* If Block has Left Sensor */
 			if(is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){ // If block has left sensor, adc is not stil converting, last conversion was processed, Then we can classify the block
-				int block_type = classify_block(adc_get_min());     // classify the block based on it's minimum adc reading
-				fifo_append(block_type);                            // add this block to the fifo
+				unsigned int min = adc_get_min();
+				if(min < 1024){                                        // If min is 1024 this is a false reading and we should skip it
+					int block_type = classify_block(min);              // classify the block based on it's minimum adc reading
+					fifo_append(block_type);                           // add this block to the fifo
+					LCDClear();
+					LCDWriteIntXY(0,0,min,4);
+					switch(block_type){
+						case(BLACK):
+						LCDWriteStringXY(0,1,"BLACK");
+						break;
+						case(ALUMINIUM):
+						LCDWriteStringXY(0,1,"ALUMINIUM");
+						break;
+						case(WHITE):
+						LCDWriteStringXY(0,1,"WHITE");
+						break;
+						case(STEEL):
+						LCDWriteStringXY(0,1,"STEEL");
+						break;
+					}
+				}
 				clear_OR_flag();                                    // clear the block gone flag
 				adc_reset_min();                                    // reset adc min to 1024
 			}

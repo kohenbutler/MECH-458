@@ -32,6 +32,7 @@ void stepper_init(){
 	STEPPER_DDR |= STEPPER_MASK;  // Set stepper IO to outputs
 	STEPPER_PORT &= ~(STEPPER_MASK); // Initialize outputs to 0
 	STEPPER_HOME_PORT &= ~(STEPPER_HOME_MASK); // Set Stepper home to input
+	return;
 }
 
 void step_cw(unsigned int steps){
@@ -101,6 +102,7 @@ void s_curve_test(){
 	step_180();
 	step_ccw90();
 	step_180();
+	return;
 }
 
 int get_bin_state(){
@@ -125,4 +127,5 @@ void Update_Stepper_Position(int pos){
 			step_ccw90();
 			break;
 	}
+	return;
 }
