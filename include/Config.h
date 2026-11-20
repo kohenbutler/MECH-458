@@ -24,12 +24,13 @@
 #define STEEL 3
 
 // Shininess Thresholds
-#define AS_THRESHOLD 150
-#define SW_THRESHOLD 700
-#define WB_THRESHOLD 900
+#define AS_THRESHOLD 450 // Just below min steel
+#define SW_THRESHOLD 850 // Just below min white
+#define WB_THRESHOLD 920 // Just below min black
 
-// Ramp Down Timing
+// Timing variables
 #define RAMP_DOWN_THRESHOLD 150000
+#define BRAKE_DELAY_THRESHOLD 8000
 
 // System States
 #define PAUSE 0

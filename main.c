@@ -48,6 +48,7 @@ int main(){
 	LCDWriteStringXY(4, 0, "SORTING");     // Display sorting message
 	DCMotor_F();                           // Start the conveyor belt
 	system_state = RUN;
+	unsigned long int braking_delay_counter = 0;
 	
 	/* Main Loop */
 	while (1){
@@ -59,8 +60,14 @@ int main(){
 				}
 			}
 			
+			/* If ADC Conversion Complete */
+			if(adc_conversion_complete()){              // If ADC result is waiting to be processed
+				adc_update_min(adc_get_result());       // Update the minimum adc reading for this block
+				clear_adc_result_flag();                // clear the adc conversion complete flag
+			}
+			
 			/* If Block has Left Sensor */
-			if(is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){ // If block has left sensor, adc is not stil converting, last conversion was processed, Then we can classify the block
+			if(is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){ // If block has left sensor, adc is not still converting, last conversion was processed, Then we can classify the block
 				unsigned int min = adc_get_min();
 				if(min < 1024){                                        // If min is 1024 this is a false reading and we should skip it
 					int block_type = classify_block(min);              // classify the block based on it's minimum adc reading
@@ -88,18 +95,16 @@ int main(){
 		
 			/* If Block at end of belt */
 			if(is_block_at_end_flag()){
-				if(get_bin_state() != get_next_block_type()){        // Check bin position
-					Update_Stepper_Position(get_next_block_type());  // If wrong, Change position
+				braking_delay_counter += 1;
+				if(braking_delay_counter > BRAKE_DELAY_THRESHOLD){       // Don't do anything here until belt is stopped (KEEP MEASURING AT ADC)
+					if(get_bin_state() != get_next_block_type()){        // If bin position is wrong
+						Update_Stepper_Position(get_next_block_type());  // Change position
+					}
+					fifo_pop_front();                                    // Remove from fifo
+					clear_block_at_end_flag();                           // Clear flag
+					braking_delay_counter = 0;
+					DCMotor_F();                                         // Restart the belt
 				}
-				DCMotor_F();                                         // Restart the belt
-				fifo_pop_front();                                    // Remove from fifo
-				clear_block_at_end_flag();                           // Clear flag
-			}
-			
-			/* If ADC Conversion Complete */
-			if(adc_conversion_complete()){              // If ADC result is waiting to be processed
-				adc_update_min(adc_get_result());       // Update the minimum adc reading for this block
-				clear_adc_result_flag();                // clear the adc conversion complete flag
 			}
 		}
 		
