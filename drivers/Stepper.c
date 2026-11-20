@@ -123,5 +123,6 @@ void Update_Stepper_Position(int pos){
 			break;
 		case 3:
 			step_ccw90();
+			break;
 	}
 }
