@@ -11,9 +11,13 @@ int is_OR_flag(void);
 void Enable_INT3(void);
 void Disable_INT3(void);
 void adc_start_conversion(void);
-unsigned char adc_is_ready(void);
+unsigned char adc_conversion_complete(void);
 unsigned int adc_get_result(void);
 void clear_adc_result_flag(void);
 int classify_block(int val);
+void adc_update_min(int val);
+void adc_reset_min(void);
+unsigned int adc_get_min(void);
+int adc_in_progress(void);
 
 #endif

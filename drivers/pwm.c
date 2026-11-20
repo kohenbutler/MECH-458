@@ -20,7 +20,7 @@ void pwm_init() {
 	OCR0A = DC_MOTOR_SPEED;
 	
 	// Set PB7 to output PWM
-	PWM_DDR = PWM_MASK;
+	PWM_DDR |= PWM_MASK;
 }
 
 void pwm_set_duty_cycle(unsigned int duty) {

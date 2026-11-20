@@ -32,7 +32,6 @@ int main(){
 	LCDClear();
 	
 	/* Initialize global variables */
-	unsigned int min = 1024;
 	unsigned int system_state;
 	unsigned long int ramp_down_counter = 0;
 	
@@ -53,11 +52,19 @@ int main(){
 	/* Main Loop */
 	while (1){
 		if(system_state){
-			/* If Block at Reflective sensor */
-			if(is_OR_flag()){
-				if((OR_INPUT_REGISTER & OR_MASK) != OR_MASK){ // If block is gone
-					int block_type = classify_block(min);     // classify the block based on it's minimum adc reading
-					fifo_append(block_type);                  // add this block to the fifo
+			/* If Block at Reflective Sensor */
+			if((OR_INPUT_REGISTER & OR_MASK) == OR_MASK && !is_OR_flag()){ // Check for block (Previous block must be classified before starting another adc conversion)
+				if(!(adc_in_progress()) && !(adc_conversion_complete())){  // If ADC not doing a conversion and previous conversion was processed
+					adc_start_conversion();                                // Start another ADC conversion
+				}
+			}
+			
+			/* If Block has Left Sensor */
+			if(is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){ // If block has left sensor, adc is not stil converting, last conversion was processed, Then we can classify the block
+				unsigned int min = adc_get_min();
+				if(min < 1024){                                        // If min is 1024 this is a false reading and we should skip it
+					int block_type = classify_block(min);              // classify the block based on it's minimum adc reading
+					fifo_append(block_type);                           // add this block to the fifo
 					LCDClear();
 					LCDWriteIntXY(0,0,min,4);
 					switch(block_type){
@@ -74,21 +81,9 @@ int main(){
 						LCDWriteStringXY(0,1,"STEEL");
 						break;
 					}
-					clear_OR_flag();                          // clear the block present flag
-					min = 1024;                               // reset adc min to 1024
 				}
-				else{                                         // If block is still there
-					adc_start_conversion();                   // Start another ADC conversion
-				}
-			}
-		
-			/* If ADC Conversion Complete */
-			if(adc_is_ready()){
-				unsigned int shiny = adc_get_result();  // Record the adc value
-				if(shiny < min){                        // Compare to the minimum adc reading of the current block
-					min = shiny;                        // If less, replace min with the adc reading
-				}
-				clear_adc_result_flag();                // clear the adc conversion complete flag
+				clear_OR_flag();                                    // clear the block gone flag
+				adc_reset_min();                                    // reset adc min to 1024
 			}
 		
 			/* If Block at end of belt */
@@ -99,6 +94,12 @@ int main(){
 				DCMotor_F();                                         // Restart the belt
 				fifo_pop_front();                                    // Remove from fifo
 				clear_block_at_end_flag();                           // Clear flag
+			}
+			
+			/* If ADC Conversion Complete */
+			if(adc_conversion_complete()){              // If ADC result is waiting to be processed
+				adc_update_min(adc_get_result());       // Update the minimum adc reading for this block
+				clear_adc_result_flag();                // clear the adc conversion complete flag
 			}
 		}
 		
