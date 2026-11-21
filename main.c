@@ -22,6 +22,7 @@ int main(){
 	
 	/* Initialize Hardware Modules */
 	timer1_init();
+	timer3_init();
 	LED_init();
 	stepper_init();
 	pwm_init();
@@ -47,16 +48,15 @@ int main(){
 	LCDClear();
 	LCDWriteStringXY(4, 0, "SORTING");     // Display sorting message
 	DCMotor_F();                           // Start the conveyor belt
-	system_state = RUN;
-	unsigned long int braking_delay_counter = 0;
+	system_state = RUN;                    // Set the system state to running
 	
 	/* Main Loop */
 	while (1){
 		if(system_state){
 			/* If Block at Reflective Sensor */
-			if((OR_INPUT_REGISTER & OR_MASK) == OR_MASK && !is_OR_flag()){ // Check for block (Previous block must be classified before starting another adc conversion)
-				if(!(adc_in_progress()) && !(adc_conversion_complete())){  // If ADC not doing a conversion and previous conversion was processed
-					adc_start_conversion();                                // Start another ADC conversion
+			if((OR_INPUT_REGISTER & OR_MASK) == OR_MASK){                                   // Check for block present
+				if(!is_OR_flag() && !(adc_in_progress()) && !(adc_conversion_complete())){  // If previous block classified, ADC not converting and previous conversion was processed
+					adc_start_conversion();                                                 // Then start another ADC conversion
 				}
 			}
 			
@@ -73,7 +73,8 @@ int main(){
 					int block_type = classify_block(min);              // classify the block based on it's minimum adc reading
 					fifo_append(block_type);                           // add this block to the fifo
 					LCDClear();
-					LCDWriteIntXY(0,0,min,4);
+					LCDWriteIntXY(0, 0, min, 4);
+					LCDWriteIntXY(7, 0, adc_get_num_readings(), 4);
 					switch(block_type){
 						case(BLACK):
 						LCDWriteStringXY(0,1,"BLACK");
@@ -92,19 +93,13 @@ int main(){
 				clear_OR_flag();                                    // clear the block gone flag
 				adc_reset_min();                                    // reset adc min to 1024
 			}
-		
+			
 			/* If Block at end of belt */
 			if(is_block_at_end_flag()){
-				braking_delay_counter += 1;
-				if(braking_delay_counter > BRAKE_DELAY_THRESHOLD){       // Don't do anything here until belt is stopped (KEEP MEASURING AT ADC)
-					if(get_bin_state() != get_next_block_type()){        // If bin position is wrong
-						Update_Stepper_Position(get_next_block_type());  // Change position
-					}
-					fifo_pop_front();                                    // Remove from fifo
-					clear_block_at_end_flag();                           // Clear flag
-					braking_delay_counter = 0;
-					DCMotor_F();                                         // Restart the belt
-				}
+				Update_Stepper_Position(get_next_block_type());      // Update Stepper
+				fifo_pop_front();                                    // Remove from fifo
+				clear_block_at_end_flag();                           // Clear flag
+				DCMotor_F();                                         // Restart the belt
 			}
 		}
 		

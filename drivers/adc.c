@@ -6,6 +6,7 @@ volatile unsigned int ADC_result = 0;
 volatile unsigned int ADC_result_flag = 0;
 volatile int OR_flag = 0;
 volatile unsigned int min = 1024;
+volatile unsigned int num_readings = 0;
 
 void adc_init() {
 	OR_DDR &= ~(OR_MASK);                 // Set OR as an input
@@ -80,16 +81,22 @@ void adc_update_min(int val){
 	if(val < min){
 		min = val;
 	}
+	num_readings += 1;
 	return;
 }
 
 void adc_reset_min(){
 	min = 1024;
+	num_readings = 0;
 	return;
 }
 
 unsigned int adc_get_min(){
 	return min;
+}
+
+unsigned int adc_get_num_readings(){
+	return num_readings;
 }
 
 int adc_in_progress(){

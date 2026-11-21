@@ -1,13 +1,35 @@
 #include "Timer.h"
+#include "Config.h"
+#include "DCmotor.h"
 #include <avr/io.h>
+#include <avr/interrupt.h>
+
+volatile unsigned int timer3_ms_counter = 0;
 
 void timer1_init(){
 	TCCR1B |= _BV(WGM12); // Auto clear timer on match
 	OCR1A = 1000;         // Timer counts to 1000 (1ms)
-	TCNT1 = 0x0000;       // Reset counter to 0
+	TCNT1 = 0;            // Reset counter to 0
 	TIFR1 |= _BV(OCF1A);  // Clear any pending compare-match flag
 	TCCR1B |= _BV(CS11);  // Start Timer1 with a /8 prescaler (1MHz)
 	return;
+}
+
+void timer3_init(){
+	TCCR3B |= _BV(WGM13);     // Auto clear timer on match
+	OCR3A = 1000;             // Timer counts to 1000 (1ms)
+	TCNT3 = 0;                // Reset counter to 0
+	TIFR3 |= _BV(OCF3A);      // Clear any pending compare-match flag
+	TIMSK3 &= ~(_BV(OCIE3A)); // Disable interrupts until timer starts
+	TCCR3B &= 0b11111000;     // Stop timer
+}
+
+void timer3_start(){
+	timer3_ms_counter = 0;  // Reset ms counter
+	TCNT3 = 0;              // Reset timer3 counter
+	TIFR3 = _BV(OCF3A);     // Clear pending compare match
+	TIMSK3 |= _BV(OCIE3A);  // Enable Interrupts
+	TCCR3B |= _BV(CS31);    // Start timer with prescaler /8
 }
 
 void timer_delay_ms(int ms){
@@ -34,4 +56,14 @@ void timer_delay_us(int us){
 		// Busy wait
 	}
 	return;
+}
+
+ISR(TIMER3_COMPA_vect)
+{
+	timer3_ms_counter += 1;                    // After 1ms increment ms counter
+	if(timer3_ms_counter >= BRAKING_TIME_MS){  // if ms counter > set delay
+		TCCR3B &= 0b11111000;                  // Stop Timer3
+		TIMSK3 &= ~(_BV(OCIE3A));              // Disable interrupt
+		set_block_at_end_flag();               // Braking interval complete
+	}
 }

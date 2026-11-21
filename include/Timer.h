@@ -6,5 +6,7 @@
 void timer1_init(void);
 void timer_delay_ms(int ms);
 void timer_delay_us(int us);
+void timer3_init(void);
+void timer3_start(void);
 
 #endif
