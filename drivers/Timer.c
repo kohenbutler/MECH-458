@@ -16,7 +16,7 @@ void timer1_init(){
 }
 
 void timer3_init(){
-	TCCR3B |= _BV(WGM13);     // Auto clear timer on match
+	TCCR3B |= _BV(WGM32);     // Auto clear timer on match
 	OCR3A = 1000;             // Timer counts to 1000 (1ms)
 	TCNT3 = 0;                // Reset counter to 0
 	TIFR3 |= _BV(OCF3A);      // Clear any pending compare-match flag
