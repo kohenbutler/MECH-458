@@ -94,9 +94,9 @@ ISR(TIMER3_COMPA_vect)
 ISR(TIMER4_COMPA_vect)
 {
 	timer4_ms_counter += 1;                      // After 1ms increment ms counter
-	if(timer3_ms_counter >= RAMP_DOWN_TIME_MS){  // if ms counter > set delay
-		TCCR3B &= 0b11111000;                    // Stop Timer3
-		TIMSK3 &= ~(_BV(OCIE3A));                // Disable interrupt
+	if(timer4_ms_counter >= RAMP_DOWN_TIME_MS){  // if ms counter > set delay
+		TCCR4B &= 0b11111000;                    // Stop Timer3
+		TIMSK4 &= ~(_BV(OCIE4A));                // Disable interrupt
 		ramp_down_flag = 1;
 	}
 }
