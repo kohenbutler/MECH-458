@@ -6,8 +6,8 @@
 #define LED_TEST_DELAY_MS         2000
 #define STEPPER_DELAY_MS	        20
 #define STEPPER_DEMO_DELAY_MS     1000
-#define RAMP_DOWN_THRESHOLD 150000
-#define BRAKING_TIME_MS 100
+#define RAMP_DOWN_TIME_MS         2000
+#define BRAKING_TIME_MS            100
 
 // Default Values
 #define DC_MOTOR_SPEED             100 // [0,255]
@@ -32,6 +32,5 @@
 // System States
 #define PAUSE 0
 #define RUN   1
-#define RAMP_DOWN 2
 
 #endif

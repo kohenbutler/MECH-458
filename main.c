@@ -23,6 +23,7 @@ int main(){
 	/* Initialize Hardware Modules */
 	timer1_init();
 	timer3_init();
+	timer4_init();
 	LED_init();
 	stepper_init();
 	pwm_init();
@@ -31,10 +32,6 @@ int main(){
 	DCMotor_init();
 	InitLCD(LS_BLINK|LS_ULINE);
 	LCDClear();
-	
-	/* Initialize global variables */
-	unsigned int system_state;
-	unsigned long int ramp_down_counter = 0;
 	
 	stepper_home(); // Initialize bin on black
 	
@@ -48,27 +45,21 @@ int main(){
 	LCDClear();
 	LCDWriteStringXY(4, 0, "SORTING");     // Display sorting message
 	DCMotor_F();                           // Start the conveyor belt
-	system_state = RUN;                    // Set the system state to running
+	unsigned int system_state = RUN;       // Set the system state to running
 	
 	/* Main Loop */
 	while (1){
 		if(system_state){
 			/* If Block at Reflective Sensor */
 			if((OR_INPUT_REGISTER & OR_MASK) == OR_MASK){                                   // Check for block present
-				if(!is_OR_flag() && !(adc_in_progress()) && !(adc_conversion_complete())){  // If previous block classified, ADC not converting and previous conversion was processed
+				if(!is_OR_flag() && !(adc_in_progress()) && !(adc_conversion_complete())){  // If previous block classified, ADC not converting, and previous conversion was processed
 					adc_start_conversion();                                                 // Then start another ADC conversion
 				}
 			}
 			
-			/* If ADC Conversion Complete */
-			if(adc_conversion_complete()){              // If ADC result is waiting to be processed
-				adc_update_min(adc_get_result());       // Update the minimum adc reading for this block
-				clear_adc_result_flag();                // clear the adc conversion complete flag
-			}
-			
 			/* If Block has Left Sensor */
-			if(is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){ // If block has left sensor, adc is not still converting, last conversion was processed, Then we can classify the block
-				unsigned int min = adc_get_min();
+			if(is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){ // If block has left sensor, adc is not still converting, and last conversion was processed
+				unsigned int min = adc_get_min();                                 // Then we can classify the block
 				if(min < 1024){                                        // If min is 1024 this is a false reading and we should skip it
 					int block_type = classify_block(min);              // classify the block based on it's minimum adc reading
 					fifo_append(block_type);                           // add this block to the fifo
@@ -101,23 +92,27 @@ int main(){
 				clear_block_at_end_flag();                           // Clear flag
 				DCMotor_F();                                         // Restart the belt
 			}
+			
+			/* If ADC Conversion Complete */
+			if(adc_conversion_complete()){              // If ADC result is waiting to be processed
+				adc_update_min(adc_get_result());       // Update the minimum adc reading for this block
+				clear_adc_result_flag();                // clear the adc conversion complete flag
+			}
 		}
 		
-		if(system_state == RAMP_DOWN){
-			if(get_num_partially_sorted() == 0 && ramp_down_counter > RAMP_DOWN_THRESHOLD){
-				LCDClear();
-				LCDWriteStringXY(1, 0, "BL AL WH ST PS");                   // Write the number of pieces sorted
-				LCDWriteIntXY(1, 1, get_num_sorted(BLACK), 2);
-				LCDWriteIntXY(4, 1, get_num_sorted(ALUMINIUM), 2);
-				LCDWriteIntXY(7, 1, get_num_sorted(WHITE), 2);
-				LCDWriteIntXY(10, 1, get_num_sorted(STEEL), 2);
-				LCDWriteIntXY(13, 1, get_num_partially_sorted(), 2);
-				DCMotor_Brake();
-				while(1){
-					Lab1KnightRider();
-				}
+		// If Ramp Down Flag is set and no pieces left on belt
+		if(is_ramp_down_flag() && get_num_partially_sorted() == 0){
+			LCDClear();
+			LCDWriteStringXY(1, 0, "BL AL WH ST PS");                // Write the number of pieces sorted
+			LCDWriteIntXY(1, 1, get_num_sorted(BLACK), 2);
+			LCDWriteIntXY(4, 1, get_num_sorted(ALUMINIUM), 2);
+			LCDWriteIntXY(7, 1, get_num_sorted(WHITE), 2);
+			LCDWriteIntXY(10, 1, get_num_sorted(STEEL), 2);
+			LCDWriteIntXY(13, 1, get_num_partially_sorted(), 2);
+			DCMotor_Brake();                                         // Stop the belt
+			while(1){
+				Lab1KnightRider();                                   // Freeze the system in knight rider
 			}
-			ramp_down_counter += 1;
 		}
 		
 		/* Left Button Handler */
@@ -128,7 +123,7 @@ int main(){
 				LCDWriteStringXY(4, 0, "SORTING");
 				DCMotor_F();
 			}
-			else if(system_state == RUN){
+			else{
 				system_state = PAUSE;
 				LCDClear();                                                 // Clear the screen
 				LCDWriteStringXY(1, 0, "BL AL WH ST PS");                   // Write the number of pieces sorted
@@ -155,7 +150,7 @@ int main(){
 		if(was_right_button_pressed()){                              // If right button pressed
 			LCDClear();                                              // Clear the screen
 			LCDWriteStringXY(2, 0, "RAMPING DOWN");                  // Write Ramping Down
-			system_state = RAMP_DOWN;
+			timer4_start();                                          // Start the ramp down counter
 			clear_right_button_pressed();                            // Clear the button pressed flag
 			set_right_button_wait_release();                         // set the waiting for release flag (for release debouncing)
 		}
