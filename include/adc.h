@@ -18,6 +18,7 @@ int classify_block(int val);
 void adc_update_min(int val);
 void adc_reset_min(void);
 unsigned int adc_get_min(void);
+unsigned int adc_get_num_readings(void);
 int adc_in_progress(void);
 
 #endif
