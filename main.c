@@ -52,7 +52,7 @@ int main(){
 		if(system_state){
 			/* If Block at Reflective Sensor */
 			if((OR_INPUT_REGISTER & OR_MASK) == OR_MASK){                                   // Check for block present
-				if(!is_OR_flag() && !(adc_in_progress()) && !(adc_conversion_complete())){  // If previous block classified, ADC not converting, and previous conversion was processed
+				if(!is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){      // If previous block classified, ADC not converting, and previous conversion was processed
 					adc_start_conversion();                                                 // Then start another ADC conversion
 				}
 			}
@@ -102,6 +102,9 @@ int main(){
 		
 		// If Ramp Down Flag is set and no pieces left on belt
 		if(is_ramp_down_flag() && get_num_partially_sorted() == 0){
+			DCMotor_F();
+			timer_delay_ms(200);                                     // Send last piece off the belt
+			DCMotor_Brake();                                         // Stop the belt
 			LCDClear();
 			LCDWriteStringXY(1, 0, "BL AL WH ST PS");                // Write the number of pieces sorted
 			LCDWriteIntXY(1, 1, get_num_sorted(BLACK), 2);
@@ -109,7 +112,6 @@ int main(){
 			LCDWriteIntXY(7, 1, get_num_sorted(WHITE), 2);
 			LCDWriteIntXY(10, 1, get_num_sorted(STEEL), 2);
 			LCDWriteIntXY(13, 1, get_num_partially_sorted(), 2);
-			DCMotor_Brake();                                         // Stop the belt
 			while(1){
 				Lab1KnightRider();                                   // Freeze the system in knight rider
 			}
