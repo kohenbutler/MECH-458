@@ -10,7 +10,7 @@
 #define BRAKING_TIME_MS            150
 
 // Default Values
-#define DC_MOTOR_SPEED             100 // [0,255]
+#define DC_MOTOR_SPEED              80 // [0,255]
 #define DEBOUNCE_DELAY              20
 
 // Conveyor States
@@ -25,9 +25,9 @@
 #define STEEL                        3
 
 // Shininess Thresholds
-#define AS_THRESHOLD               300 // Just below min steel
-#define SW_THRESHOLD               905 // Just below min white
-#define WB_THRESHOLD               940 // Just below min black
+#define AS_THRESHOLD                60 // Just below min steel
+#define SW_THRESHOLD               850 // Just below min white
+#define WB_THRESHOLD               918 // Just below min black
 
 // System States
 #define PAUSE                        0

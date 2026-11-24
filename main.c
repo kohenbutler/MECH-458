@@ -60,7 +60,8 @@ int main(){
 			/* If Block has Left Sensor */
 			if(is_OR_flag() && !adc_in_progress() && !adc_conversion_complete()){ // If block has left sensor, adc is not still converting, and last conversion was processed
 				unsigned int min = adc_get_min();                                 // Then we can classify the block
-				if(min < 1024){                                        // If min is 1024 this is a false reading and we should skip it
+				unsigned int num_read = adc_get_num_readings();
+				if(min < 1000 && num_read > 250){                      // If min is 1024 this is a false reading and we should skip it
 					int block_type = classify_block(min);              // classify the block based on it's minimum adc reading
 					fifo_append(block_type);                           // add this block to the fifo
 					LCDClear();
